@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/susan-wz/tinyapp/issues"
   },
-  "homepage": "https://github.com/susan-wz/tinyapp#readme"
+  "homepage": "https://github.com/susan-wz/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
