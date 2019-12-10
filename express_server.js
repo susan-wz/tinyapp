@@ -11,7 +11,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-function generateRandomString() {
+let generateRandomString = function () {
   let result = "";
   let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 6; i++) {
@@ -19,6 +19,11 @@ function generateRandomString() {
   } return result;
 }
 
+const updateURL = (shortURL, longURL) => {
+  urlDatabase[shortURL] = longURL;
+};
+
+// HOME PAGE, doesn't do anyting
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -27,11 +32,13 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// INDEX PAGE, shows listing of URLs
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+// CREATES NEW SHORTENED URL
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString()
   urlDatabase[shortURL] = req.body.longURL;
@@ -39,6 +46,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+// REDIRECTS TO LONG URL, adds https if needed
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL];
@@ -46,19 +54,29 @@ app.get("/u/:shortURL", (req, res) => {
     longURL = "https://" + longURL;
   }
   res.redirect(longURL);
-  console.log(longURL);
 });
 
+// DELETES URL FROM DATABASE
 app.post("/urls/:shortURL/delete", (req, res) => {
   let shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect("/urls")
 });
 
+// UPDATES LONG URL IN DATABASE
+app.post("/urls/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL; 
+  let longURL = req.body.longURL;
+  updateURL(shortURL,longURL);
+  res.redirect("/urls")
+});
+
+// SHOWS NEW URL PAGE
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// SHOWS INDIVIDUAL URL PAGE
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL] };
@@ -74,7 +92,7 @@ app.get("/set", (req, res) => {
   res.send(`a = ${a}`);
  });
  
- app.get("/fetch", (req, res) => {
+app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
  });
 
