@@ -49,6 +49,12 @@ app.get("/u/:shortURL", (req, res) => {
   console.log(longURL);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls")
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -73,5 +79,5 @@ app.get("/set", (req, res) => {
  });
 
 app.listen(PORT, () => {
-  console.log(`Susan's tinyapp app listening on port ${PORT}!`);
+  console.log(`Susan's tinyapp listening on port ${PORT}!`);
 });
