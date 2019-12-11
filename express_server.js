@@ -3,14 +3,16 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(cookieParser());
+app.use(morgan("dev"));
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "uOgi6A" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "uOgi6A" }
 };
 
 const users = {
@@ -19,10 +21,10 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
+  "testUser": {
+    id: "uOgi6A",
+    email: "testusername@gmail.com",
+    password: "12345"
   }
 };
 
@@ -35,17 +37,38 @@ const generateRandomString = function () {
 };
 
 const updateURL = (shortURL, longURL) => {
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
 };
 
 const checkUserEmailExists = function (email) {
   return Object.values(users).some(element => element.email === email);
 };
 
-const lookupUserId = function(emailLookup) {
+const lookupUserId = function (emailLookup) {
   return Object.values(users).find(user => user.email === emailLookup).id
-  };
-  
+};
+
+const urlsForUser = function (id) {
+  let matchingKeys = [], userFilteredUrlDatabase = {};
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      matchingKeys.push(url);
+    }
+  }
+  matchingKeys.forEach(key => {
+    userFilteredUrlDatabase[key] = urlDatabase[key];
+  });
+  return userFilteredUrlDatabase;
+}
+
+const belongsToUser = function (id, shortURL) {
+  let usersUrls = urlsForUser(id); let found = false;
+  Object.keys(usersUrls).forEach(url => {
+    if (url === shortURL) {
+      found = true;
+    }
+  }); return found;
+}
 
 // HOME PAGE, doesn't do anything
 app.get("/", (req, res) => {
@@ -59,22 +82,27 @@ app.get("/urls.json", (req, res) => {
 // INDEX PAGE, shows listing of URLs
 app.get("/urls", (req, res) => {
   let user = users[req.cookies["user_id"]];
-  let templateVars = { urls: urlDatabase, user };
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  let filteredUrlDatabase = urlsForUser(user.id);
+  let templateVars = { urls: filteredUrlDatabase, user };
   res.render("urls_index", templateVars);
 });
 
 // CREATES NEW SHORTENED URL
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  console.log("Current urlDatabase:\n", urlDatabase);
+  let user = req.cookies["user_id"];
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: user };
   res.redirect(`/urls/${shortURL}`);
 });
 
 // REDIRECTS TO LONG URL, adds https if needed
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[shortURL].longURL;
   if (!longURL.startsWith("http")) {
     longURL = "https://" + longURL;
   }
@@ -83,6 +111,11 @@ app.get("/u/:shortURL", (req, res) => {
 
 // DELETES URL FROM DATABASE
 app.post("/urls/:shortURL/delete", (req, res) => {
+  let user = users[req.cookies["user_id"]];
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
   let shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
@@ -90,6 +123,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // UPDATES LONG URL IN DATABASE
 app.post("/urls/:shortURL", (req, res) => {
+  let user = users[req.cookies["user_id"]];
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
   let shortURL = req.params.shortURL;
   let longURL = req.body.longURL;
   updateURL(shortURL, longURL);
@@ -111,11 +149,10 @@ app.post("/login", (req, res) => {
     res.status(403).send("This email cannot be found.");
     return;
   } else {
-    console.log("the users database: ", users);
     let user_id = lookupUserId(emailInput);
-    console.log("the user_id gettind checked: ", user_id)
     if (passwordInput !== users[user_id].password) {
       res.status(403).send("Password does not match");
+      return;
     } else {
       res.cookie("user_id", user_id);
       res.redirect("/urls");
@@ -155,6 +192,10 @@ app.post("/register", (req, res) => {
 // SHOWS NEW URL PAGE
 app.get("/urls/new", (req, res) => {
   let user = users[req.cookies["user_id"]];
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
   let templateVars = { user };
   res.render("urls_new", templateVars);
 });
@@ -163,7 +204,15 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let user = users[req.cookies["user_id"]];
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL], user };
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  if (!belongsToUser(user.id, shortURL)) {
+    res.status(401).send("You're not authorised to access this tinyURL.")
+    return;
+  }
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user };
   res.render("urls_show", templateVars);
 });
 
