@@ -4,6 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const bcrypt = require("bcrypt");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -150,12 +151,12 @@ app.post("/login", (req, res) => {
     return;
   } else {
     let user_id = lookupUserId(emailInput);
-    if (passwordInput !== users[user_id].password) {
-      res.status(403).send("Password does not match");
-      return;
-    } else {
+    if (bcrypt.compareSync(passwordInput, users[user_id].password)) {
       res.cookie("user_id", user_id);
       res.redirect("/urls");
+    } else {
+      res.status(403).send("Password does not match");
+      return;
     }
   }
 });
@@ -184,7 +185,9 @@ app.post("/register", (req, res) => {
     res.status(400).send("This email is already taken.");
     return;
   }
-  users[userID] = { id: userID, email: req.body.email, password: req.body.password };
+  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  users[userID] = { id: userID, email: req.body.email, password: hashedPassword };
+  (console.log("current url database: \n", users))
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
