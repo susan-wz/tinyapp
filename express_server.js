@@ -224,6 +224,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+// GENERAL 404 PAGE
+app.get("/:anythingelse", (req, res) => {
+  showErrorPage(req, res, 404, "Page not found. But never lost...")
+  return;
+})
+
 app.listen(PORT, () => {
   console.log(`Susan's tinyapp listening on port ${PORT}!`);
 });
