@@ -1,0 +1,52 @@
+const generateRandomString = function() {
+  let result = "";
+  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  } return result;
+};
+
+const updateURL = (shortURL, longURL, database) => {
+  database[shortURL].longURL = longURL;
+};
+
+const checkUserEmailExists = function(email, database) {
+  return Object.values(database).some(element => element.email === email);
+};
+
+const getUserByEmail = function(emailLookup, database) {
+  return Object.values(database).find(user => user.email === emailLookup).id;
+};
+
+const urlsForUser = function(id, database) {
+  let matchingKeys = [], userFilteredUrlDatabase = {};
+  for (let url in database) {
+    if (database[url].userID === id) {
+      matchingKeys.push(url);
+    }
+  }
+  matchingKeys.forEach(key => {
+    userFilteredUrlDatabase[key] = database[key];
+  });
+  return userFilteredUrlDatabase;
+};
+
+const belongsToUser = function(id, shortURL, database) {
+  let usersUrls = urlsForUser(id, database); let found = false;
+  Object.keys(usersUrls).forEach(url => {
+    if (url === shortURL) {
+      found = true;
+    }
+  }); return found;
+};
+
+
+
+module.exports = { 
+  generateRandomString,
+  updateURL, 
+  checkUserEmailExists, 
+  getUserByEmail, 
+  urlsForUser,
+  belongsToUser
+};
