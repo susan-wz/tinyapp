@@ -67,7 +67,6 @@ const urlsForUser = function (id) {
 
 const belongsToUser = function (id, shortURL) {
   let usersUrls = urlsForUser(id); let found = false;
-  console.log("usersUrls: ", usersUrls);
   Object.keys(usersUrls).forEach(url => {
     if (url === shortURL) {
       found = true;
@@ -87,7 +86,6 @@ app.get("/urls.json", (req, res) => {
 // INDEX PAGE, shows listing of URLs
 app.get("/urls", (req, res) => {
   let user = users[req.session.user_id]; // COOKIE OVER HERE
-  console.log("this is the cookie thing at the mo: ", req.session.user_id)
   if (!req.session.user_id) {
     res.redirect("/login");
     return;
@@ -105,38 +103,27 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-// REDIRECTS TO LONG URL, adds https if needed
-app.get("/u/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL].longURL;
-  if (!longURL.startsWith("http")) {
-    longURL = "https://" + longURL;
-  }
-  res.redirect(longURL);
+// REGISTRATION PAGE
+app.get("/register", (req, res) => {
+  let user = users[req.session.user_id]; // COOKIE OVER HERE
+  let templateVars = { user };
+  res.render("register", templateVars);
 });
 
-// DELETES URL FROM DATABASE
-app.post("/urls/:shortURL/delete", (req, res) => {
-  let user = users[req.session.user_id]; // COOKIE OVER HERE
-  if (!user) {
-    res.redirect("/login");
+// POST TO REGISTER
+app.post("/register", (req, res) => {
+  let userID = generateRandomString();
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send("Please input both an email and a password.");
     return;
   }
-  let shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
-  res.redirect("/urls");
-});
-
-// UPDATES LONG URL IN DATABASE
-app.post("/urls/:shortURL", (req, res) => {
-  let user = users[req.session.user_id]; // COOKIE OVER HERE
-  if (!user) {
-    res.redirect("/login");
+  if (checkUserEmailExists(req.body.email)) {
+    res.status(400).send("This email is already taken.");
     return;
   }
-  let shortURL = req.params.shortURL;
-  let longURL = req.body.longURL;
-  updateURL(shortURL, longURL);
+  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  users[userID] = { id: userID, email: req.body.email, password: hashedPassword };
+  req.session.user_id = userID; // COOKIE OVER HERE
   res.redirect("/urls");
 });
 
@@ -166,37 +153,6 @@ app.post("/login", (req, res) => {
   }
 });
 
-// LOGOUT
-app.post("/logout", (req, res) => {
-  req.session.user_id = null; // COOKIE OVER HERE
-  res.redirect("/urls");
-});
-
-// REGISTRATION PAGE
-app.get("/register", (req, res) => {
-  let user = users[req.session.user_id]; // COOKIE OVER HERE
-  let templateVars = { user };
-  res.render("register", templateVars);
-});
-
-// POST TO REGISTER
-app.post("/register", (req, res) => {
-  let userID = generateRandomString();
-  if (!req.body.email || !req.body.password) {
-    res.status(400).send("Please input both an email and a password.");
-    return;
-  }
-  if (checkUserEmailExists(req.body.email)) {
-    res.status(400).send("This email is already taken.");
-    return;
-  }
-  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  users[userID] = { id: userID, email: req.body.email, password: hashedPassword };
-  (console.log("current url database: \n", users))
-  req.session.user_id = userID; // COOKIE OVER HERE
-  res.redirect("/urls");
-});
-
 // SHOWS NEW URL PAGE
 app.get("/urls/new", (req, res) => {
   let user = users[req.session.user_id]; // COOKIE OVER HERE
@@ -206,6 +162,12 @@ app.get("/urls/new", (req, res) => {
   }
   let templateVars = { user };
   res.render("urls_new", templateVars);
+});
+
+// LOGOUT
+app.post("/logout", (req, res) => {
+  req.session.user_id = null; // COOKIE OVER HERE
+  res.redirect("/urls");
 });
 
 // SHOWS INDIVIDUAL URL PAGE
@@ -222,6 +184,41 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user };
   res.render("urls_show", templateVars);
+});
+
+// UPDATES LONG URL IN DATABASE
+app.post("/urls/:shortURL", (req, res) => {
+  let user = users[req.session.user_id]; // COOKIE OVER HERE
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  let shortURL = req.params.shortURL;
+  let longURL = req.body.longURL;
+  updateURL(shortURL, longURL);
+  res.redirect("/urls");
+});
+
+// REDIRECTS TO LONG URL, adds https if needed
+app.get("/u/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL;
+  let longURL = urlDatabase[shortURL].longURL;
+  if (!longURL.startsWith("http")) {
+    longURL = "https://" + longURL;
+  }
+  res.redirect(longURL);
+});
+
+// DELETES URL FROM DATABASE
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let user = users[req.session.user_id]; // COOKIE OVER HERE
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  let shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
