@@ -43,6 +43,24 @@ const belongsToUser = function(id, shortURL, database) {
   }); return found;
 };
 
+const sumTotalVisits = function(database, shortURL) {
+  if (!database[shortURL]) {
+    return 0;
+  }
+  let visitsArray = Object.values(database[shortURL]);
+  let total = 0;
+  visitsArray.forEach(element => {
+    total += element;
+  }); return total;
+};
+
+const countUniqueVistors = function(database, shortURL) {
+  if (!database[shortURL]) {
+    return 0;
+  }
+  return Object.keys(database[shortURL]).length;
+}
+
 module.exports = {
   generateRandomString,
   updateURL,
@@ -50,4 +68,6 @@ module.exports = {
   getUserByEmail,
   urlsForUser,
   belongsToUser,
+  sumTotalVisits,
+  countUniqueVistors
 };

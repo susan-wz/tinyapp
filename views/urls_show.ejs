@@ -5,7 +5,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>URL - TinyApp Example</title>
+  <title>Susan's Tinyapp - Your URL</title>
 </head>
 
 <body>
@@ -33,6 +33,24 @@
       </div>
     </div>
     <div class="card-footer text-muted"></div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header"></div>
+    <div class="card-body">
+      <h5 class="card-title">Analytics</h5>
+      <span><b>Total Number of Visits: </b></span>
+      <span><% if(visitsDatabase[shortURL]) { %>
+        <%= totalVisits %>
+        <% } else { %>
+        <%= 0%>
+        <% } %>
+      </span><br>
+      <span><b>Number of Unique Visitors: </b></span>
+      <span><%= uniqueVisitorsNumber %>
+      </span>
+    </div>
+  </div>
+  <div class="card-footer text-muted"></div>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

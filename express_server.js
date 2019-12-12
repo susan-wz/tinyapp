@@ -32,13 +32,35 @@ const users = {
   }
 };
 
-const { generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belongsToUser, getUserByEmail } = require("./helpers");
+const visitsDatabase = {}
 
-const showErrorPage = function(req, res, errorNo, errorMsg) {
+const { generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belongsToUser, getUserByEmail, sumTotalVisits, countUniqueVistors } = require("./helpers");
+
+const showErrorPage = function (req, res, errorNo, errorMsg) {
   let user = users[req.session.user_id];
-  let templateVars = {errorNo, errorMsg, user};
+  let templateVars = { errorNo, errorMsg, user };
   res.status(errorNo).render("error", templateVars);
 };
+
+// MIDDLEWARE TO COUNT VISITORS TO SHORTURLS
+app.use('/u/:shortURL', (req, res, next) => {
+  let shortURL = req.params.shortURL;
+  if (!req.session.uniqueVisitor) {
+    req.session.uniqueVisitor = generateRandomString();
+  }
+  let visitorId = req.session.uniqueVisitor;
+  if (!visitsDatabase[shortURL]) {
+    visitsDatabase[shortURL] = { [visitorId]: 1 };
+  } else {
+    if (!visitsDatabase[shortURL][visitorId]) {
+      visitsDatabase[shortURL][visitorId] = 1;
+    } else {
+      visitsDatabase[shortURL][visitorId] += 1;
+    }
+  }
+  console.log("this is the visits database: \n", visitsDatabase)
+  next();
+})
 
 // HOME PAGE, doesn't do anything
 app.get("/", (req, res) => {
@@ -57,7 +79,7 @@ app.get("/urls", (req, res) => {
     return;
   }
   let filteredUrlDatabase = urlsForUser(user.id, urlDatabase);
-  let templateVars = { urls: filteredUrlDatabase, user };
+  let templateVars = { urls: filteredUrlDatabase, user, visitsDatabase, visitsDatabase, sumTotalVisits, countUniqueVistors };
   res.render("urls_index", templateVars);
 });
 
@@ -148,6 +170,9 @@ app.post("/logout", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let user = users[req.session.user_id];
+  let totalVisits = sumTotalVisits(visitsDatabase, shortURL)
+  let uniqueVisitorsNumber = countUniqueVistors(visitsDatabase, shortURL)
+  console.log("this is visits database:\n", visitsDatabase, "\n", "this is shortURL:", shortURL)
   if (!user) {
     res.redirect("/login");
     return;
@@ -156,7 +181,7 @@ app.get("/urls/:shortURL", (req, res) => {
     showErrorPage(req, res, 401, "This tinyURL does not exist, or you're not authorised to view it.");
     return;
   }
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user, visitsDatabase, uniqueVisitorsNumber, totalVisits };
   res.render("urls_show", templateVars);
 });
 
