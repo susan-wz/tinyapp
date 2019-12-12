@@ -36,9 +36,9 @@ const { generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belo
 
 const showErrorPage = function(req, res, errorNo, errorMsg) {
   let user = users[req.session.user_id];
-  let templateVars = {errorNo, errorMsg, user}
-  res.status(errorNo).render("error", templateVars)
-}
+  let templateVars = {errorNo, errorMsg, user};
+  res.status(errorNo).render("error", templateVars);
+};
 
 // HOME PAGE, doesn't do anything
 app.get("/", (req, res) => {
@@ -84,11 +84,11 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   let userID = generateRandomString();
   if (!req.body.email || !req.body.password) {
-    showErrorPage(req, res, 400, "Please input both an email and a password.")
+    showErrorPage(req, res, 400, "Please input both an email and a password.");
     return;
   }
   if (checkUserEmailExists(req.body.email, users)) {
-    showErrorPage(req, res, 400, "This email is already taken.")
+    showErrorPage(req, res, 400, "This email is already taken.");
     return;
   }
   let hashedPassword = bcrypt.hashSync(req.body.password, 10);
@@ -113,7 +113,7 @@ app.post("/login", (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
   if (!checkUserEmailExists(emailInput, users)) {
-    showErrorPage(req, res, 403, "This account cannot be found.")
+    showErrorPage(req, res, 403, "This account cannot be found.");
     return;
   } else {
     let user_id = getUserByEmail(emailInput, users);
@@ -121,7 +121,7 @@ app.post("/login", (req, res) => {
       req.session.user_id = user_id;
       res.redirect("/urls");
     } else {
-      showErrorPage(req, res, 403, "Password does not match.")
+      showErrorPage(req, res, 403, "Password does not match.");
       return;
     }
   }
@@ -153,7 +153,7 @@ app.get("/urls/:shortURL", (req, res) => {
     return;
   }
   if (!belongsToUser(user.id, shortURL, urlDatabase)) {
-    showErrorPage(req, res, 401, "This tinyURL does not exist, or you're not authorised to view it.")
+    showErrorPage(req, res, 401, "This tinyURL does not exist, or you're not authorised to view it.");
     return;
   }
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user };
@@ -177,7 +177,7 @@ app.post("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if (!urlDatabase[shortURL]) {
-    showErrorPage(req, res, 401, "This tinyURL doesn't exist yet. Make one by logging in or registering.")
+    showErrorPage(req, res, 401, "This tinyURL doesn't exist yet. Make one by logging in or registering.");
     return;
   }
   let longURL = urlDatabase[shortURL].longURL;

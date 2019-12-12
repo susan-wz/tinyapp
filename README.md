@@ -2,6 +2,8 @@
 
 A bit.ly clone project I built in week 3 of the Lighthouse Labs bootcamp. It is a full stack web application built with Node and Express that allows users to shorten long URLs. 
 
+## Final Product
+
 ## Dependencies
 
 - Node.js

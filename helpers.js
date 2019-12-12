@@ -43,11 +43,11 @@ const belongsToUser = function(id, shortURL, database) {
   }); return found;
 };
 
-module.exports = { 
+module.exports = {
   generateRandomString,
-  updateURL, 
-  checkUserEmailExists, 
-  getUserByEmail, 
+  updateURL,
+  checkUserEmailExists,
+  getUserByEmail,
   urlsForUser,
-  belongsToUser, 
+  belongsToUser,
 };
