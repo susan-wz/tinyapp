@@ -24,11 +24,13 @@
     <div class="card-header"></div>
     <div class="card-body">
       <h5 class="card-title">Update your URL</h5>
-      <span>New URL</span>
-      <form method="POST" action="/urls/<%= shortURL %>">
-      <input type="text" name="longURL" id="longURL" value="<%= longURL %>" size="30" />
-      <button type="submit">Update</button></form>
-    </form>
+      <div class="form-group">
+        <form method="POST" action="/urls/<%= shortURL %>">
+          <label for="longURL">New URL</label>
+          <input type="text" name="longURL" id="longURL" value="<%= longURL %>" size="30" />
+          <button type="submit" class="btn btn-primary">Update</button></form>
+        </form>
+      </div>
     </div>
     <div class="card-footer text-muted"></div>
   </div>
