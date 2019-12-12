@@ -2,36 +2,24 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
+  <title>URL - TinyApp Example</title>
 </head>
 
 <body>
-  <main style="margin: 1em;">
-    <header>
-      <%- include('partials/_header') %>
-    </header>
-    <h3>Log in to use Tinyapp</h3>
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">Login</h5>
-        <form method="POST" action="/login">
-          <span class="card-text">Email</a></span>
-          <input type="email" name="email" id="email" /><br>
-          <span class="card-text">Password</a></span>
-          <input type="password" name="password" id="password" /><br>
-          <button type="submit">Login</button></form>
-        </form>
-      </div>
-      <div class="card-footer text-muted"></div>
+  <header>
+    <%- include('partials/_header') %>
+  </header>
+  <div class="card text-center">
+    <div class="card-header"></div>
+    <div class="card-body">
+      <h3 class="card-title">Error <%= errorNo %></h3>
+      <p class="card-text"><%= errorMsg %></p>
     </div>
-  </main>
+    <div class="card-footer text-muted"></div>
+  </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

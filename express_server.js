@@ -32,11 +32,17 @@ const users = {
   }
 };
 
-const {generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belongsToUser, getUserByEmail} = require("./helpers");
+const { generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belongsToUser, getUserByEmail } = require("./helpers");
+
+const showErrorPage = function(req, res, errorNo, errorMsg) {
+  let user = users[req.session.user_id];
+  let templateVars = {errorNo, errorMsg, user}
+  res.status(errorNo).render("error", templateVars)
+}
 
 // HOME PAGE, doesn't do anything
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -46,7 +52,6 @@ app.get("/urls.json", (req, res) => {
 // INDEX PAGE, shows listing of URLs
 app.get("/urls", (req, res) => {
   let user = users[req.session.user_id];
-  console.log("this is req.session.user_id: ", req.session.user_id)
   if (!req.session.user_id) {
     res.redirect("/login");
     return;
@@ -67,6 +72,10 @@ app.post("/urls", (req, res) => {
 // REGISTRATION PAGE
 app.get("/register", (req, res) => {
   let user = users[req.session.user_id];
+  if (user) {
+    res.redirect("/urls");
+    return;
+  }
   let templateVars = { user };
   res.render("register", templateVars);
 });
@@ -75,22 +84,26 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   let userID = generateRandomString();
   if (!req.body.email || !req.body.password) {
-    res.status(400).send("Please input both an email and a password.");
+    showErrorPage(req, res, 400, "Please input both an email and a password.")
     return;
   }
   if (checkUserEmailExists(req.body.email, users)) {
-    res.status(400).send("This email is already taken.");
+    showErrorPage(req, res, 400, "This email is already taken.")
     return;
   }
   let hashedPassword = bcrypt.hashSync(req.body.password, 10);
   users[userID] = { id: userID, email: req.body.email, password: hashedPassword };
-  req.session.user_id = userID; 
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
 // LOGIN PAGE - SHOWS PAGE
 app.get("/login", (req, res) => {
-  let user = users[req.session.user_id]; 
+  let user = users[req.session.user_id];
+  if (user) {
+    res.redirect("/urls");
+    return;
+  }
   let templateVars = { user };
   res.render("login", templateVars);
 });
@@ -100,15 +113,15 @@ app.post("/login", (req, res) => {
   let emailInput = req.body.email;
   let passwordInput = req.body.password;
   if (!checkUserEmailExists(emailInput, users)) {
-    res.status(403).send("This email cannot be found.");
+    showErrorPage(req, res, 403, "This account cannot be found.")
     return;
   } else {
-    let user_id = getUserByEmail(emailInput, users); 
+    let user_id = getUserByEmail(emailInput, users);
     if (bcrypt.compareSync(passwordInput, users[user_id].password)) {
-      req.session.user_id = user_id; 
+      req.session.user_id = user_id;
       res.redirect("/urls");
     } else {
-      res.status(403).send("Password does not match");
+      showErrorPage(req, res, 403, "Password does not match.")
       return;
     }
   }
@@ -116,7 +129,7 @@ app.post("/login", (req, res) => {
 
 // SHOWS NEW URL PAGE
 app.get("/urls/new", (req, res) => {
-  let user = users[req.session.user_id]; 
+  let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
     return;
@@ -127,20 +140,20 @@ app.get("/urls/new", (req, res) => {
 
 // LOGOUT
 app.post("/logout", (req, res) => {
-  req.session.user_id = null; 
+  req.session.user_id = null;
   res.redirect("/urls");
 });
 
 // SHOWS INDIVIDUAL URL PAGE
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let user = users[req.session.user_id]; 
+  let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
     return;
   }
   if (!belongsToUser(user.id, shortURL, urlDatabase)) {
-    res.status(401).send("You're not authorised to access this tinyURL.");
+    showErrorPage(req, res, 401, "This tinyURL does not exist, or you're not authorised to view it.")
     return;
   }
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[shortURL].longURL, user };
@@ -149,7 +162,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // UPDATES LONG URL IN DATABASE
 app.post("/urls/:shortURL", (req, res) => {
-  let user = users[req.session.user_id]; 
+  let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
     return;
@@ -163,6 +176,10 @@ app.post("/urls/:shortURL", (req, res) => {
 // REDIRECTS TO LONG URL, adds https if needed
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    showErrorPage(req, res, 401, "This tinyURL doesn't exist yet. Make one by logging in or registering.")
+    return;
+  }
   let longURL = urlDatabase[shortURL].longURL;
   if (!longURL.startsWith("http")) {
     longURL = "https://" + longURL;
@@ -172,7 +189,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 // DELETES URL FROM DATABASE
 app.post("/urls/:shortURL/delete", (req, res) => {
-  let user = users[req.session.user_id]; 
+  let user = users[req.session.user_id];
   if (!user) {
     res.redirect("/login");
     return;

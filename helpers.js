@@ -15,6 +15,9 @@ const checkUserEmailExists = function(email, database) {
 };
 
 const getUserByEmail = function(emailLookup, database) {
+  if (!Object.values(database).find(user => user.email === emailLookup)) {
+    return undefined;
+  }
   return Object.values(database).find(user => user.email === emailLookup).id;
 };
 
@@ -40,13 +43,11 @@ const belongsToUser = function(id, shortURL, database) {
   }); return found;
 };
 
-
-
 module.exports = { 
   generateRandomString,
   updateURL, 
   checkUserEmailExists, 
   getUserByEmail, 
   urlsForUser,
-  belongsToUser
+  belongsToUser, 
 };
