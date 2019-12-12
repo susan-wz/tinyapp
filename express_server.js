@@ -32,7 +32,7 @@ const users = {
   }
 };
 
-const visitsDatabase = {}
+const visitsDatabase = {};
 
 const { generateRandomString, updateURL, checkUserEmailExists, urlsForUser, belongsToUser, getUserByEmail, sumTotalVisits, countUniqueVistors } = require("./helpers");
 
@@ -58,9 +58,9 @@ app.use('/u/:shortURL', (req, res, next) => {
       visitsDatabase[shortURL][visitorId] += 1;
     }
   }
-  console.log("this is the visits database: \n", visitsDatabase)
+  console.log("this is the visits database: \n", visitsDatabase);
   next();
-})
+});
 
 // HOME PAGE, doesn't do anything
 app.get("/", (req, res) => {
@@ -79,7 +79,7 @@ app.get("/urls", (req, res) => {
     return;
   }
   let filteredUrlDatabase = urlsForUser(user.id, urlDatabase);
-  let templateVars = { urls: filteredUrlDatabase, user, visitsDatabase, visitsDatabase, sumTotalVisits, countUniqueVistors };
+  let templateVars = { urls: filteredUrlDatabase, user, visitsDatabase, sumTotalVisits, countUniqueVistors };
   res.render("urls_index", templateVars);
 });
 
@@ -170,9 +170,9 @@ app.post("/logout", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   let user = users[req.session.user_id];
-  let totalVisits = sumTotalVisits(visitsDatabase, shortURL)
-  let uniqueVisitorsNumber = countUniqueVistors(visitsDatabase, shortURL)
-  console.log("this is visits database:\n", visitsDatabase, "\n", "this is shortURL:", shortURL)
+  let totalVisits = sumTotalVisits(visitsDatabase, shortURL);
+  let uniqueVisitorsNumber = countUniqueVistors(visitsDatabase, shortURL);
+  console.log("this is visits database:\n", visitsDatabase, "\n", "this is shortURL:", shortURL);
   if (!user) {
     res.redirect("/login");
     return;
@@ -226,9 +226,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // GENERAL 404 PAGE
 app.get("/:anythingelse", (req, res) => {
-  showErrorPage(req, res, 404, "Page not found. But never lost...")
+  showErrorPage(req, res, 404, "Page not found. But never lost...");
   return;
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Susan's tinyapp listening on port ${PORT}!`);
