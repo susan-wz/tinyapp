@@ -59,7 +59,7 @@ const countUniqueVistors = function(database, shortURL) {
     return 0;
   }
   return Object.keys(database[shortURL]).length;
-}
+};
 
 module.exports = {
   generateRandomString,
