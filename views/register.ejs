@@ -8,30 +8,31 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <!-- App CSS -->
+  <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
   <title>Susan's TinyApp - Register</title>
+  <!-- App JS -->
+  <script type="text/javascript" src="/scripts/client.js"></script>
 </head>
 
 <body>
-  <main style="margin: 1em;">
-    <header>
-      <%- include('partials/_header') %>
-    </header>
-    <h3>Register</h3>
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">New User Registration</h5>
-        <form method="POST" action="/register">
-          <span class="card-text">Email</a></span>
-          <input type="email" name="email" id="email" /><br>
-          <span class="card-text">Password</a></span>
-          <input type="password" name="password" id="password" /><br>
-          <button type="submit" class="btn btn-primary">Sign Up</button></form>
-        </form>
+  <header>
+    <%- include('partials/_header') %>
+  </header>
+  <main id="auth-main">
+    <div id="auth-box">
+      <h2>Register</h2>
+      <form class="auth-fields" method="POST" action="/register">
+        <input class="auth-input form-control" type="email" name="email" id="email" placeholder="Email" />
+        <input class="auth-input form-control" type="password" name="password" id="password" placeholder="Password" />
+        <button type="submit" class="btn btn-outline-primary btn-block">Sign Up</button>
+      </form>
+      <div class="auth-footer">
+        <p class="font-weight-light">Or <a href="/login">Login Here</a></p>
       </div>
-      <div class="card-footer text-muted"></div>
     </div>
   </main>
+
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

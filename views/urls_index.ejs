@@ -8,47 +8,54 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <!-- App CSS -->
+  <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+  <!-- App JS -->
+  <script type="text/javascript" src="/scripts/client.js"></script>
+
   <title>Susan's TinyApp - Your URLs</title>
 </head>
 
 <body>
-  <main style="margin: 1em;">
-    <header>
-      <%- include('partials/_header') %>
-    </header>
-    <h3>My URLs</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th scope="col">Number of visits</th>
-          <th scope="col">Unique Visitors</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% for(let url in urls) { %>
-        <tr>
-          <td><%= url %></td>
-          <td><%= urls[url].longURL %></td>
-          <td><% if(visitsDatabase[url]) { %>
-            <%= sumTotalVisits(visitsDatabase, url) %>
-            <% } else { %>
-            <%= 0%>
-            <% } %>
-          </td>
-          <td><%= countUniqueVistors(visitsDatabase, url) %></td>
-          <td><a href="/urls/<%= url %>"><button type="submit" class="btn btn-primary">Edit</button></a></td>
-          <td>
-            <form method="POST" action="/urls/<%= url %>/delete"><button type="submit"
-                class="btn btn-primary">Delete</button></form>
-          </td>
-        </tr>
-        <% } %>
-      </tbody>
-    </table>
+  <header>
+    <%- include('partials/_header') %>
+  </header>
+  <main class="index-main">
+    <div class="index-box">
+      <h2>My Links</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Short Link</th>
+            <th scope="col">Long Link</th>
+            <th scope="col">Number of visits</th>
+            <th scope="col">Unique Visitors</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let url in urls) { %>
+          <tr>
+            <td><%= url %></td>
+            <td><%= urls[url].longURL %></td>
+            <td><% if(visitsDatabase[url]) { %>
+              <%= sumTotalVisits(visitsDatabase, url) %>
+              <% } else { %>
+              <%= 0%>
+              <% } %>
+            </td>
+            <td><%= countUniqueVistors(visitsDatabase, url) %></td>
+            <td><a href="/urls/<%= url %>"><button type="submit" class="btn btn-outline-primary btn-block">Edit</button></a></td>
+            <td>
+              <form method="POST" action="/urls/<%= url %>/delete"><button type="submit"
+                  class="btn btn-outline-primary btn-block">Delete</button></form>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
   </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
