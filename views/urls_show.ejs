@@ -15,18 +15,18 @@
   <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-      <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+      <h5 class="card-title">TinyLink for: <%= longURL %></h5>
+      <p class="card-text">Short Link: <a href="/u/<%= shortURL %>" target="_blank"><%= shortURL %></a></p>
     </div>
     <div class="card-footer text-muted"></div>
   </div>
   <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-      <h5 class="card-title">Update your URL</h5>
+      <h5 class="card-title">Update your Link</h5>
       <div class="form-group">
         <form method="POST" action="/urls/<%= shortURL %>">
-          <label for="longURL">New URL</label>
+          <label for="longURL">New Link</label>
           <input type="text" name="longURL" id="longURL" value="<%= longURL %>" size="30" />
           <button type="submit" class="btn btn-primary">Update</button></form>
         </form>

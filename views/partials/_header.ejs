@@ -1,5 +1,5 @@
-<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #3FA7D6; min-height: 10vh;">
-  <a class="navbar-brand" href="#">TinyApp</a>
+<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #3FA7D6; min-height: 12vh;">
+  <a class="navbar-brand" href="#">TinyLink</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
     aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -14,7 +14,7 @@
       </li>
     </ul>
       <% if(user){ %>
-      <span class="navbar-text font-weight-bold" style="padding-right: 8px">Logged in as <%= user.email %></span>
+      <span class="navbar-text font-weight-bold" style="padding-right: 12px">Logged in as <%= user.email %></span>
       <form method="POST" action="/logout">
         <button type="submit" class="btn btn-light">Log out</button>
       </form>

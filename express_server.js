@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const bcrypt = require("bcrypt");
 
 app.use(express.static('public'));
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(morgan("dev"));
@@ -89,7 +90,7 @@ app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let user = users[req.session.user_id];
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: user.id };
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls`);
 });
 
 // REGISTRATION PAGE

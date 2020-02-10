@@ -10,6 +10,8 @@
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <!-- App CSS -->
   <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- App JS -->
   <script type="text/javascript" src="/scripts/client.js"></script>
 
@@ -21,7 +23,7 @@
     <%- include('partials/_header') %>
   </header>
   <main class="index-main">
-    <div class="index-box">
+    <div class="index-box unit-box">
       <h2>My Links</h2>
       <table class="table table-hover">
         <thead>
@@ -36,8 +38,8 @@
         </thead>
         <tbody>
           <% for(let url in urls) { %>
-          <tr>
-            <td><%= url %></td>
+          <tr class="link-row">
+            <td><a href="/u/<%= url %>" target="_blank"><%= url %></a></td>
             <td><%= urls[url].longURL %></td>
             <td><% if(visitsDatabase[url]) { %>
               <%= sumTotalVisits(visitsDatabase, url) %>
@@ -46,7 +48,8 @@
               <% } %>
             </td>
             <td><%= countUniqueVistors(visitsDatabase, url) %></td>
-            <td><a href="/urls/<%= url %>"><button type="submit" class="btn btn-outline-primary btn-block">Edit</button></a></td>
+            <td><a href="/urls/<%= url %>"><button type="submit"
+                  class="btn btn-outline-primary btn-block">Edit</button></a></td>
             <td>
               <form method="POST" action="/urls/<%= url %>/delete"><button type="submit"
                   class="btn btn-outline-primary btn-block">Delete</button></form>
@@ -55,6 +58,19 @@
           <% } %>
         </tbody>
       </table>
+    </div>
+    <div class="info-right">
+      <div class="create-box unit-box">
+        <h3>Create New Short Link</h3>
+        <form class="form-inline form-group mb-2 auth-fields width-stretch" action="/urls" method="POST">
+          <input class="form-control auth-input" style="width: 100%;" type="text" name="longURL" placeholder="http://">
+          <button type="submit" class="btn btn-outline-primary btn-block">Submit</button>
+        </form>
+      </div>
+      <div class="show-box unit-box">
+        <h3>Link Info</h3>
+        <p>Hover over a link in your list to find out more information.</p>
+      </div>
     </div>
   </main>
   <!-- Bootstrap JS -->
